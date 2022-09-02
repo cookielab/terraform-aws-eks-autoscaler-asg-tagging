@@ -41,7 +41,7 @@ locals {
           for label_key, label_value in local.node_groups_labels[node_group_name] : {
             autoscaling_group = autoscaling_group
             label = {
-              key = "k8s.io/cluster-autoscaler/node-template/label/${label_key}"
+              key   = "k8s.io/cluster-autoscaler/node-template/label/${label_key}"
               value = label_value
             }
           }
@@ -52,77 +52,77 @@ locals {
   autoscaling_groups_aws_labels = {
     for v in flatten([
       for node_group_name, autoscaling_groups in local.node_groups_autoscaling_groups : flatten([
-          for autoscaling_group in autoscaling_groups : concat(
-            [
-              # {
-              #   autoscaling_group = autoscaling_group
-              #   label = {
-              #     key = "k8s.io/cluster-autoscaler/node-template/label/eks.amazonaws.com/capacityType"
-              #     value = data.aws_eks_node_group.this[node_group_name].capacity_type
-              #   }
-              # },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/region"
-                  value = data.aws_region.current.name
-                }
-              },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/failure-domain.beta.kubernetes.io/region"
-                  value = data.aws_region.current.name
-                }
-              },
-            ],
-            length(data.aws_eks_node_group.this[node_group_name].subnet_ids) == 1 ? [
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/zone"
-                  value = data.aws_subnet.this[one(data.aws_eks_node_group.this[node_group_name].subnet_ids)].availability_zone
-                }
-              },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/failure-domain.beta.kubernetes.io/zone"
-                  value = data.aws_subnet.this[one(data.aws_eks_node_group.this[node_group_name].subnet_ids)].availability_zone
-                }
+        for autoscaling_group in autoscaling_groups : concat(
+          [
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/eks.amazonaws.com/capacityType"
+                value = data.aws_eks_node_group.this[node_group_name].capacity_type
               }
-            ] : [],
-            data.aws_eks_node_group.this[node_group_name].ami_type != "CUSTOM" ? [
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/kubernetes.io/os"
-                  value = "linux"
-                }
-              },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/beta.kubernetes.io/os"
-                  value = "linux"
-                }
-              },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/kubernetes.io/arch"
-                  value = length(regexall(".*x86_64.*", data.aws_eks_node_group.this[node_group_name].ami_type)) != 0 ? "amd64" : "arm64"
-                }
-              },
-              {
-                autoscaling_group = autoscaling_group
-                label = {
-                  key = "k8s.io/cluster-autoscaler/node-template/label/beta.kubernetes.io/arch"
-                  value = length(regexall(".*x86_64.*", data.aws_eks_node_group.this[node_group_name].ami_type)) != 0 ? "amd64" : "arm64"
-                }
-              },
-            ] : []
-          )
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/region"
+                value = data.aws_region.current.name
+              }
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/failure-domain.beta.kubernetes.io/region"
+                value = data.aws_region.current.name
+              }
+            },
+          ],
+          length(data.aws_eks_node_group.this[node_group_name].subnet_ids) == 1 ? [
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/zone"
+                value = data.aws_subnet.this[one(data.aws_eks_node_group.this[node_group_name].subnet_ids)].availability_zone
+              }
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/failure-domain.beta.kubernetes.io/zone"
+                value = data.aws_subnet.this[one(data.aws_eks_node_group.this[node_group_name].subnet_ids)].availability_zone
+              }
+            }
+          ] : [],
+          data.aws_eks_node_group.this[node_group_name].ami_type != "CUSTOM" ? [
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/kubernetes.io/os"
+                value = "linux"
+              }
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/beta.kubernetes.io/os"
+                value = "linux"
+              }
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/kubernetes.io/arch"
+                value = length(regexall(".*x86_64.*", data.aws_eks_node_group.this[node_group_name].ami_type)) != 0 ? "amd64" : "arm64"
+              }
+            },
+            {
+              autoscaling_group = autoscaling_group
+              label = {
+                key   = "k8s.io/cluster-autoscaler/node-template/label/beta.kubernetes.io/arch"
+                value = length(regexall(".*x86_64.*", data.aws_eks_node_group.this[node_group_name].ami_type)) != 0 ? "amd64" : "arm64"
+              }
+            },
+          ] : []
+        )
       ])
     ]) : "${v.autoscaling_group}#${v.label.key}" => v
   }
@@ -134,8 +134,8 @@ resource "aws_autoscaling_group_tag" "label" {
   autoscaling_group_name = each.value.autoscaling_group
 
   tag {
-    key = each.value.label.key
-    value = each.value.label.value
+    key                 = each.value.label.key
+    value               = each.value.label.value
     propagate_at_launch = true
   }
 }
@@ -146,8 +146,8 @@ resource "aws_autoscaling_group_tag" "aws_label" {
   autoscaling_group_name = each.value.autoscaling_group
 
   tag {
-    key = each.value.label.key
-    value = each.value.label.value
+    key                 = each.value.label.key
+    value               = each.value.label.value
     propagate_at_launch = true
   }
 }
