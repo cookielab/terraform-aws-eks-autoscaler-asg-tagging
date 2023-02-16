@@ -24,6 +24,11 @@ data "aws_subnet" "this" {
 }
 
 locals {
+  tains_map = {
+    NO_SCHEDULE        = "NoSchedule"
+    NO_EXECUTE         = "NoExecute"
+    PREFER_NO_SCHEDULE = "PreferNoSchedule"
+  }
   node_groups_autoscaling_groups = {
     for node_group in data.aws_eks_node_group.this : node_group.node_group_name => toset(flatten([
       for resource in node_group.resources : [
@@ -56,11 +61,11 @@ locals {
     for v in flatten([
       for node_group_name, autoscaling_groups in local.node_groups_autoscaling_groups : flatten([
         for autoscaling_group in autoscaling_groups : flatten([
-          for taint_key, taint_value in local.node_groups_taint[node_group_name] : {
+          for taint_values in local.node_groups_taint[node_group_name] : {
             autoscaling_group = autoscaling_group
             taint = {
-              key   = "k8s.io/cluster-autoscaler/node-template/taint/${taint_key}"
-              value = taint_value
+              key   = "k8s.io/cluster-autoscaler/node-template/taint/${taint_values.key}"
+              value = "${taint_values.value}:${local.tains_map[taint_values.effect]}"
             }
           }
         ])
