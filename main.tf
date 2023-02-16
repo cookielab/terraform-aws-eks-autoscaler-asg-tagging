@@ -39,8 +39,8 @@ locals {
   node_groups_labels = {
     for node_group in data.aws_eks_node_group.this : node_group.node_group_name => node_group.labels
   }
-  node_groups_taint = {
-    for node_group in data.aws_eks_node_group.this : node_group.node_group_name => node_group.taint
+  node_groups_taints = {
+    for node_group in data.aws_eks_node_group.this : node_group.node_group_name => node_group.taints
   }
   autoscaling_groups_labels = {
     for v in flatten([
@@ -61,7 +61,7 @@ locals {
     for v in flatten([
       for node_group_name, autoscaling_groups in local.node_groups_autoscaling_groups : flatten([
         for autoscaling_group in autoscaling_groups : flatten([
-          for taint_values in local.node_groups_taint[node_group_name] : {
+          for taint_values in local.node_groups_taints[node_group_name] : {
             autoscaling_group = autoscaling_group
             taint = {
               key   = "k8s.io/cluster-autoscaler/node-template/taint/${taint_values.key}"
